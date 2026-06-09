@@ -11,11 +11,6 @@ Run the standard offline sample with:
 .\.venv\Scripts\python.exe main.py --scenario scenarios/offline/sample-offline.yaml
 ```
 
-Run the compatibility entrypoint with:
-```powershell
-.\.venv\Scripts\python.exe rag_eval/offline_eval.py --input datasets/normalized/sample_offline_rag_eval.csv --output runs/offline-compat
-```
-
 Run tests with:
 ```powershell
 .\.venv\Scripts\python.exe -m unittest discover -s tests

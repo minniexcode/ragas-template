@@ -34,7 +34,10 @@ class OpenAIConfigTests(unittest.TestCase):
     def test_openai_client_kwargs_without_base_url(self) -> None:
         with mock.patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"}, clear=True):
             settings = EnvOnlySettings()
-            self.assertEqual(settings.openai_client_kwargs, {"api_key": "test-key"})
+            self.assertEqual(
+                settings.openai_client_kwargs,
+                {"api_key": "test-key", "base_url": "http://6.86.80.4:30080/v1"},
+            )
 
     def test_openai_client_kwargs_with_base_url(self) -> None:
         with mock.patch.dict(
@@ -54,8 +57,9 @@ class OpenAIConfigTests(unittest.TestCase):
     def test_settings_defaults(self) -> None:
         with mock.patch.dict(os.environ, {}, clear=True):
             settings = EnvOnlySettings()
-            self.assertEqual(settings.ragas_judge_model, "gpt-4o-mini")
-            self.assertEqual(settings.ragas_embedding_model, "text-embedding-3-large")
+            self.assertEqual(settings.openai_base_url, "http://6.86.80.4:30080/v1")
+            self.assertEqual(settings.ragas_judge_model, "deepseek-v4-flash")
+            self.assertEqual(settings.ragas_embedding_model, "text-embedding-v3")
             self.assertEqual(settings.batch_size, 8)
 
 

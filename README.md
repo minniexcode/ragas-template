@@ -6,6 +6,10 @@
 
 架构边界来自 [docs/rag-eval-architecture.md](/C:/Users/A200477427/Learnings/ragas-template/docs/rag-eval-architecture.md)，当前代码已经按该文档落了第一版工程结构。
 
+如果你想快速理解一次评测在代码里是怎么跑起来的，可以继续看：
+
+- [docs/rag-eval-engine-flow.md](/C:/Users/A200477427/Learnings/ragas-template/docs/rag-eval-engine-flow.md)
+
 ## 2. 当前结构
 
 ```text
@@ -38,7 +42,6 @@
 - `ragas` 指标流水线装配
 - 统一 `Evaluator` 执行流程
 - 标准 `runs/<scenario>/` 本地资产输出
-- 兼容旧用法的 `rag_eval/offline_eval.py` 薄入口
 
 ## 3. 简单离线 dataset 案例
 
@@ -70,12 +73,15 @@ Copy-Item .env.example .env
 
 如果你现在的 OpenAI 兼容模型都可用，这里直接填你已有的网关和 key 即可。默认模型现在是：
 
-- `RAGAS_JUDGE_MODEL=gpt-4o-mini`
-- `RAGAS_EMBEDDING_MODEL=text-embedding-3-large`
+- `OPENAI_BASE_URL=http://6.86.80.4:30080/v1`
+- `RAGAS_JUDGE_MODEL=deepseek-v4-flash`
+- `RAGAS_EMBEDDING_MODEL=text-embedding-v3`
 
 推荐直接走统一入口：
 
 ```powershell
+uv run main.py --scenario scenarios/offline/sample-offline.yaml
+or
 .\.venv\Scripts\python.exe main.py --scenario scenarios/offline/sample-offline.yaml
 ```
 
@@ -88,14 +94,6 @@ runs/sample-offline-baseline/<run_id>/
 ├── invalid.csv
 ├── summary.md
 └── metadata.json
-```
-
-如果你还想沿用旧命令，也可以：
-
-```powershell
-.\.venv\Scripts\python.exe rag_eval/offline_eval.py `
-  --input datasets/normalized/sample_offline_rag_eval.csv `
-  --output runs/offline-compat
 ```
 
 ## 5. 在线接入预留

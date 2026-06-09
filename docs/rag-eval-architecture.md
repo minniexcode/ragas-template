@@ -2,7 +2,7 @@
 
 ## 1. 背景与问题
 
-当前仓库已经有一个可运行的离线评测原型，核心实现集中在 `rag_eval/offline_eval.py`。这个原型适合验证以下问题：
+当前仓库已经有一个可运行的离线评测原型，其能力已经收敛到统一的 `main.py --scenario ...` 入口与 `rag_eval/` 分层模块中。这个原型适合验证以下问题：
 
 - 离线导出的 RAG 样本能否被标准化
 - `ragas` 指标能否稳定跑通
@@ -311,8 +311,8 @@ scenario_name: legal-assistant-offline-baseline
 mode: offline
 app_adapter: null
 dataset: datasets/normalized/legal_assistant_baseline.csv
-judge_model: gpt-4o-mini
-embedding_model: text-embedding-3-large
+judge_model: deepseek-v4-flash
+embedding_model: text-embedding-v3
 metrics:
   - faithfulness
   - answer_relevancy
@@ -563,43 +563,43 @@ runs/<run_id>/
 
 ## 12. 演进路线
 
-现有 `rag_eval/offline_eval.py` 是过渡实现，后续将逐步拆分并收敛到统一 CLI。
+当前仓库已经完成从单脚本离线评测到统一 CLI 的第一轮收敛，后续重点不再是移除旧入口，而是继续完善场景、接入、结果治理与测试能力。
 
 推荐拆分路径如下：
 
-### 12.1 第一阶段：抽离离线模式公共能力
+### 12.1 第一阶段：抽离离线模式公共能力（已完成）
 
-从 `rag_eval/offline_eval.py` 中拆出：
+当前已完成以下能力下沉：
 
 - 输入文件加载
 - 样本标准化
 - 指标装配
 - 结果写出
 
-目标是让离线模式先摆脱“单文件全包”的结构。
+结果是离线模式已经摆脱“单文件全包”的结构，进入统一模块分层。
 
-### 12.2 第二阶段：引入 `Scenario` 与 YAML 配置
+### 12.2 第二阶段：引入 `Scenario` 与 YAML 配置（已完成）
 
-让当前命令行参数逐步退居为补充覆盖项，主入口改为读取 YAML 场景配置。
+当前主入口已经改为读取 YAML 场景配置。
 
-### 12.3 第三阶段：引入应用适配器
+### 12.3 第三阶段：引入应用适配器（已完成第一版）
 
-补齐在线模式：
+当前已具备在线模式的一等公民适配器：
 
 - HTTP Adapter
 - Python Function Adapter
 
-此时在线和离线模式将共享同一条标准化与评分流程。
+在线和离线模式已经共享同一条标准化与评分流程。
 
-### 12.4 第四阶段：统一 CLI 入口
+### 12.4 第四阶段：统一 CLI 入口（已完成）
 
-后续 `main.py` 将演化为统一 CLI 入口，例如：
+当前统一 CLI 入口如下：
 
 ```powershell
 python main.py --scenario scenarios/offline/sample.yaml
 ```
 
-而当前的 `rag_eval/offline_eval.py` 将只作为过渡实现存在，最终要么被薄封装调用，要么被完全拆解替代。
+旧的兼容入口已经移除，仓库统一以 scenario 驱动的入口为准。
 
 ### 12.5 第五阶段：完善结果治理与测试
 
@@ -621,4 +621,3 @@ python main.py --scenario scenarios/offline/sample.yaml
 - 统一按照配置层、接入层、数据层、指标层、执行层、结果层拆分代码
 
 后续工程实现应直接遵循这些边界推进，而不再重新讨论整体骨架。
-
