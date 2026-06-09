@@ -1,3 +1,5 @@
+"""Compatibility helpers for optional third-party import paths."""
+
 from __future__ import annotations
 
 import sys
@@ -25,6 +27,7 @@ def ensure_ragas_import_compat() -> None:
     except ModuleNotFoundError:
         pass
 
+    # Inject a minimal shim so ragas can import successfully in stripped builds.
     shim = types.ModuleType(module_name)
 
     class ChatVertexAI:  # pragma: no cover - only used for import compatibility

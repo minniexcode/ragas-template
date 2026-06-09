@@ -1,0 +1,15 @@
+scenario_name: sample-offline-baseline
+mode: offline
+app_adapter: null
+dataset: ../../datasets/normalized/sample_offline_rag_eval.csv
+judge_model: gpt-4o-mini
+embedding_model: text-embedding-3-large
+metrics:
+  - faithfulness
+  - answer_relevancy
+  - context_recall
+  - context_precision
+output_dir: ../../runs/sample-offline-baseline
+runtime:
+  batch_size: 4
+  max_samples: 3
