@@ -1,0 +1,3 @@
+sample_id,question,contexts,answer,ground_truth,scenario,language,retrieval_config
+leave-policy-001,How many annual leave days does an employee with 6 years of service receive?,"[""Employees with 1 to 9 completed years of service receive 5 days of annual leave."",""Employees with 10 to 19 completed years of service receive 10 days of annual leave.""]","An employee with 6 years of service receives 5 annual leave days.","Employees with 1 to 9 completed years of service receive 5 annual leave days.",policy,en,"top_k=2;chunk_size=300"
+leave-policy-002,入职满12年的员工年假有几天？,"[""员工入司满1年不满10年的，年休假5天。"", ""员工入司满10年不满20年的，年休假10天。""]","根据规定，入职满12年的员工有10天年假。","员工入司满10年不满20年的，年休假10天。",policy,zh,"top_k=2;chunk_size=300"

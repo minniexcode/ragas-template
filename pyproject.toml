@@ -1,0 +1,14 @@
+[project]
+name = "ragas-template"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "datasets>=4.0.0",
+    "langchain-community==0.4.2",
+    "langchain-openai==1.2.2",
+    "openai>=1.0.0",
+    "pandas>=3.0.0",
+    "ragas==0.4.3",
+]
