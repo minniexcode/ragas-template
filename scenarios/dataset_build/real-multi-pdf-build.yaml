@@ -1,0 +1,17 @@
+job_name: real-multi-pdf-question-bank
+input:
+  path: ../../datasets/raw/pdfs
+  glob: "*.pdf"
+parser:
+  provider: aliyun_docmind
+  failure_mode: fail
+generation:
+  output_type: online_question_bank
+  review_mode: draft_with_manual_review
+  max_questions_per_document: 4
+  max_source_chunks_per_question: 3
+output:
+  dataset_path: ../../datasets/raw/generated/real-multi-pdf-question-bank.csv
+  artifact_dir: ../../outputs/dataset-builds/real-multi-pdf-question-bank
+runtime:
+  max_documents: 3

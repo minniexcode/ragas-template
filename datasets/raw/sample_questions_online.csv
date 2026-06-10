@@ -1,3 +1,0 @@
-sample_id,question,ground_truth,scenario,language
-online-1,What is RAG?,RAG combines retrieval and generation.,online-sample,en
-online-2,Why do we need evaluation?,Evaluation helps compare quality across versions.,online-sample,en

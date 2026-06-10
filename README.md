@@ -39,6 +39,7 @@
 
 - `YAML` 场景加载与校验
 - 离线 dataset 加载、标准化、无效样本分流
+- `PDF -> online dataset draft` 的 dataset build 链路
 - `ragas` 指标流水线装配
 - 统一 `Evaluator` 执行流程
 - 标准 `runs/<scenario>/` 本地资产输出
@@ -125,3 +126,26 @@ def run(question: str, **kwargs) -> dict:
 - `metadata.json`：机器可读元数据
 
 这意味着后续你比较不同模型、不同 prompt、不同检索策略时，不需要再靠手工记参数。
+
+## 7. PDF 题库构建
+
+仓库现在额外支持把 PDF 文档解析成可人工复核的在线题库草稿。样例配置在：
+
+- [scenarios/dataset_build/sample-pdf-build.yaml](/C:/Users/A200477427/Learnings/ragas-template/scenarios/dataset_build/sample-pdf-build.yaml)
+
+运行方式：
+
+```powershell
+uv run main.py --dataset-build-config scenarios/dataset_build/sample-pdf-build.yaml
+or
+.\.venv\Scripts\python.exe main.py --dataset-build-config scenarios/dataset_build/sample-pdf-build.yaml
+```
+
+这条链路会：
+
+- 扫描单个 PDF 或 PDF 目录
+- 调用阿里云解析能力并归一化成 `source chunks`
+- 调用 LLM 生成在线评测题库草稿
+- 输出 `dataset_draft.csv`、`source_chunks.jsonl`、`parse_failures.csv`、`metadata.json` 等本地资产
+
+生成后的草稿 dataset 默认只要求 `question` 和 `ground_truth`，后续进入 `online` 评测时再由 adapter 补齐 `answer` 和 `contexts`。

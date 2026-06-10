@@ -1,0 +1,168 @@
+{
+  "data": [
+    {
+      "id": "text-embedding-v3",
+      "object": "model",
+      "created": 1626777600,
+      "owned_by": "custom",
+      "supported_endpoint_types": [
+        "openai"
+      ]
+    },
+    {
+      "id": "qwen3-vl-embedding",
+      "object": "model",
+      "created": 1626777600,
+      "owned_by": "custom",
+      "supported_endpoint_types": [
+        "openai"
+      ]
+    },
+    {
+      "id": "qwen3-vl-plus",
+      "object": "model",
+      "created": 1626777600,
+      "owned_by": "custom",
+      "supported_endpoint_types": [
+        "openai"
+      ]
+    },
+    {
+      "id": "qwen3-omni-flash",
+      "object": "model",
+      "created": 1626777600,
+      "owned_by": "custom",
+      "supported_endpoint_types": [
+        "openai"
+      ]
+    },
+    {
+      "id": "deepseek-v3.2",
+      "object": "model",
+      "created": 1626777600,
+      "owned_by": "custom",
+      "supported_endpoint_types": [
+        "openai"
+      ]
+    },
+    {
+      "id": "glm-5",
+      "object": "model",
+      "created": 1626777600,
+      "owned_by": "zhipu_4v",
+      "supported_endpoint_types": [
+        "openai"
+      ]
+    },
+    {
+      "id": "qwen3.5-plus",
+      "object": "model",
+      "created": 1626777600,
+      "owned_by": "custom",
+      "supported_endpoint_types": [
+        "openai"
+      ]
+    },
+    {
+      "id": "glm-5.1",
+      "object": "model",
+      "created": 1626777600,
+      "owned_by": "custom",
+      "supported_endpoint_types": [
+        "openai"
+      ]
+    },
+    {
+      "id": "kimi-k2.6",
+      "object": "model",
+      "created": 1626777600,
+      "owned_by": "custom",
+      "supported_endpoint_types": [
+        "openai"
+      ]
+    },
+    {
+      "id": "deepseek-v4-pro",
+      "object": "model",
+      "created": 1626777600,
+      "owned_by": "deepseek",
+      "supported_endpoint_types": [
+        "openai"
+      ]
+    },
+    {
+      "id": "qwen3.6-flash",
+      "object": "model",
+      "created": 1626777600,
+      "owned_by": "custom",
+      "supported_endpoint_types": [
+        "openai"
+      ]
+    },
+    {
+      "id": "qwen3.5-flash",
+      "object": "model",
+      "created": 1626777600,
+      "owned_by": "custom",
+      "supported_endpoint_types": [
+        "openai"
+      ]
+    },
+    {
+      "id": "qwen3-vl-flash",
+      "object": "model",
+      "created": 1626777600,
+      "owned_by": "custom",
+      "supported_endpoint_types": [
+        "openai"
+      ]
+    },
+    {
+      "id": "qwen3.6-max-preview",
+      "object": "model",
+      "created": 1626777600,
+      "owned_by": "custom",
+      "supported_endpoint_types": [
+        "openai"
+      ]
+    },
+    {
+      "id": "text-embedding-v4",
+      "object": "model",
+      "created": 1626777600,
+      "owned_by": "custom",
+      "supported_endpoint_types": [
+        "openai"
+      ]
+    },
+    {
+      "id": "kimi-k2.5",
+      "object": "model",
+      "created": 1626777600,
+      "owned_by": "moonshot",
+      "supported_endpoint_types": [
+        "openai"
+      ]
+    },
+    {
+      "id": "qwen3.6-plus",
+      "object": "model",
+      "created": 1626777600,
+      "owned_by": "custom",
+      "supported_endpoint_types": [
+        "openai"
+      ]
+    },
+    {
+      "id": "deepseek-v4-flash",
+      "object": "model",
+      "created": 1626777600,
+      "owned_by": "deepseek",
+      "supported_endpoint_types": [
+        "openai"
+      ]
+    }
+  ],
+  "object": "list",
+  "success": true
+}

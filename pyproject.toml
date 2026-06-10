@@ -5,6 +5,10 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "alibabacloud-credentials>=1.0.3",
+    "alibabacloud-docmind-api20220711>=1.0.8",
+    "alibabacloud-tea-openapi>=0.4.1",
+    "alibabacloud-tea-util>=0.3.13",
     "datasets>=4.0.0",
     "langchain-community==0.4.2",
     "langchain-openai==1.2.2",

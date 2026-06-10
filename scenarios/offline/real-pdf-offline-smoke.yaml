@@ -1,0 +1,15 @@
+scenario_name: real-pdf-offline-smoke
+mode: offline
+app_adapter: null
+dataset: ../../datasets/normalized/real_multi_pdf_offline_smoke.csv
+judge_model: deepseek-v4-flash
+embedding_model: text-embedding-v3
+metrics:
+  - faithfulness
+  - answer_relevancy
+  - context_recall
+  - context_precision
+output_dir: ../../outputs/real-pdf-offline-smoke
+runtime:
+  batch_size: 4
+  max_samples: 6

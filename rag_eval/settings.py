@@ -27,6 +27,29 @@ class EvaluationSettings(BaseSettings):
         alias="RAGAS_EMBEDDING_MODEL",
     )
     batch_size: int = Field(default=8, alias="BATCH_SIZE")
+    alibaba_access_key_id: str | None = Field(default=None, alias="ALIBABA_ACCESS_KEY_ID")
+    alibaba_access_key_secret: str | None = Field(default=None, alias="ALIBABA_ACCESS_KEY_SECRET")
+    alibaba_endpoint: str | None = Field(default=None, alias="ALIBABA_ENDPOINT")
+    aliyun_parse_poll_interval_seconds: int = Field(
+        default=5,
+        alias="ALIYUN_PARSE_POLL_INTERVAL_SECONDS",
+    )
+    aliyun_parse_timeout_seconds: int = Field(
+        default=600,
+        alias="ALIYUN_PARSE_TIMEOUT_SECONDS",
+    )
+    aliyun_parse_layout_step_size: int = Field(
+        default=50,
+        alias="ALIYUN_PARSE_LAYOUT_STEP_SIZE",
+    )
+    aliyun_llm_enhancement: bool = Field(default=False, alias="ALIYUN_LLM_ENHANCEMENT")
+    aliyun_enhancement_mode: str = Field(default="balanced", alias="ALIYUN_ENHANCEMENT_MODE")
+    document_parse_artifact_prefix: str = Field(
+        default="outputs/dataset-builds",
+        alias="DOCUMENT_PARSE_ARTIFACT_PREFIX",
+    )
+    parser_failure_mode: str = Field(default="fail", alias="PARSER_FAILURE_MODE")
+    dataset_generator_model: str | None = Field(default=None, alias="DATASET_GENERATOR_MODEL")
 
     @property
     def openai_client_kwargs(self) -> dict[str, str]:

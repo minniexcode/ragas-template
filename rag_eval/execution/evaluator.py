@@ -34,6 +34,7 @@ class Evaluator:
         raw_records = load_dataset_records(self.scenario.dataset.path)
         samples, invalid_samples = normalize_records(
             raw_records,
+            mode=self.scenario.mode,
             max_samples=self.scenario.runtime.max_samples,
         )
 
