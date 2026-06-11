@@ -11,6 +11,17 @@ Mode = Literal["offline", "online"]
 AdapterType = Literal["http", "python"]
 
 
+def _serialize_paths(value: Any) -> Any:
+    """Convert Path instances nested inside snapshot payloads into POSIX strings."""
+    if isinstance(value, Path):
+        return value.as_posix()
+    if isinstance(value, dict):
+        return {key: _serialize_paths(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_serialize_paths(item) for item in value]
+    return value
+
+
 @dataclass(slots=True)
 class RuntimeConfig:
     """Concurrency and sampling controls for one evaluation run."""
@@ -68,12 +79,7 @@ class Scenario:
 
     def snapshot(self) -> dict[str, Any]:
         """Serialize the scenario into a reporting-friendly dictionary snapshot."""
-        payload = asdict(self)
-        payload["dataset"]["path"] = self.dataset.path.as_posix()
-        payload["output_dir"] = self.output_dir.as_posix()
-        if self.source_path is not None:
-            payload["source_path"] = self.source_path.as_posix()
-        return payload
+        return _serialize_paths(asdict(self))
 
 
 @dataclass(slots=True)

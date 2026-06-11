@@ -62,17 +62,16 @@ def build_summary_markdown(result: EvaluationResult) -> str:
         else:
             lines.append(f"- {metric}: `n/a`")
 
-    # Surface the weakest-scoring samples first to make manual inspection faster.
-    lowest_metric = result.scenario.metrics[0]
-    preview_columns = ["sample_id", lowest_metric]
-    preview = scores.nsmallest(min(3, len(scores)), lowest_metric)[preview_columns]
+    # Keep the summary self-sufficient by including every scored sample and its errors.
+    detail_columns = ["sample_id", *result.scenario.metrics, "error"]
+    detail = scores[detail_columns]
     lines.extend(
         [
             "",
-            f"## Lowest {lowest_metric}",
+            "## Per-sample Scores",
             "",
             "```text",
-            _table_from_frame(preview),
+            _table_from_frame(detail),
             "```",
         ]
     )

@@ -26,6 +26,8 @@ class EvaluationSettings(BaseSettings):
         default="text-embedding-v3",
         alias="RAGAS_EMBEDDING_MODEL",
     )
+    openai_timeout_seconds: float = Field(default=30.0, alias="OPENAI_TIMEOUT_SECONDS")
+    ragas_metric_timeout_seconds: float = Field(default=45.0, alias="RAGAS_METRIC_TIMEOUT_SECONDS")
     batch_size: int = Field(default=8, alias="BATCH_SIZE")
     alibaba_access_key_id: str | None = Field(default=None, alias="ALIBABA_ACCESS_KEY_ID")
     alibaba_access_key_secret: str | None = Field(default=None, alias="ALIBABA_ACCESS_KEY_SECRET")
@@ -52,12 +54,15 @@ class EvaluationSettings(BaseSettings):
     dataset_generator_model: str | None = Field(default=None, alias="DATASET_GENERATOR_MODEL")
 
     @property
-    def openai_client_kwargs(self) -> dict[str, str]:
+    def openai_client_kwargs(self) -> dict[str, str | float]:
         """Return keyword arguments for the OpenAI client when credentials are available."""
         if not self.openai_api_key:
             return {}
 
-        client_kwargs: dict[str, str] = {"api_key": self.openai_api_key}
+        client_kwargs: dict[str, str | float] = {
+            "api_key": self.openai_api_key,
+            "timeout": max(1.0, float(self.openai_timeout_seconds)),
+        }
         if self.openai_base_url.strip():
             client_kwargs["base_url"] = self.openai_base_url.strip()
         return client_kwargs

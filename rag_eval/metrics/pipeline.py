@@ -15,6 +15,7 @@ class MetricPipeline:
     """Score one or many normalized samples against a configured metric set."""
 
     metrics: dict[str, Any]
+    metric_timeout_seconds: float | None = None
 
     async def score_sample(self, sample: NormalizedSample) -> MetricScore:
         """Score a single sample and capture metric-level failures without aborting."""
@@ -31,30 +32,39 @@ class MetricPipeline:
 
     async def _run_metric(self, name: str, metric: Any, sample: NormalizedSample) -> Any:
         """Dispatch one metric call with the argument shape expected by that metric."""
+        timeout = None
+        if self.metric_timeout_seconds is not None:
+            timeout = max(1.0, float(self.metric_timeout_seconds))
+
         if name == "faithfulness":
-            return await metric.ascore(
+            coroutine = metric.ascore(
                 user_input=sample.question,
                 response=sample.answer,
                 retrieved_contexts=sample.contexts,
             )
-        if name == "answer_relevancy":
-            return await metric.ascore(
+        elif name == "answer_relevancy":
+            coroutine = metric.ascore(
                 user_input=sample.question,
                 response=sample.answer,
             )
-        if name == "context_recall":
-            return await metric.ascore(
+        elif name == "context_recall":
+            coroutine = metric.ascore(
                 user_input=sample.question,
                 retrieved_contexts=sample.contexts,
                 reference=sample.ground_truth,
             )
-        if name == "context_precision":
-            return await metric.ascore(
+        elif name == "context_precision":
+            coroutine = metric.ascore(
                 user_input=sample.question,
                 reference=sample.ground_truth,
                 retrieved_contexts=sample.contexts,
             )
-        raise ValueError(f"Unsupported metric: {name}")
+        else:
+            raise ValueError(f"Unsupported metric: {name}")
+
+        if timeout is None:
+            return await coroutine
+        return await asyncio.wait_for(coroutine, timeout=timeout)
 
     async def score_samples(
         self,

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 import json
+import shutil
 from pathlib import Path
 from typing import Any
 
@@ -52,6 +53,17 @@ def _write_csv(path: Path, rows: list[dict[str, Any]], fieldnames: list[str] | N
         writer.writeheader()
         if normalized_rows:
             writer.writerows(normalized_rows)
+
+
+def _write_latest_alias_assets(result: DatasetBuildResult) -> None:
+    """Publish stable alias files so sample scenarios can target the latest build output."""
+    latest_dir = result.job.artifact_dir / "latest"
+    ensure_directory(latest_dir)
+
+    # Keep the canonical run directory and also expose a stable entrypoint for tutorials.
+    shutil.copyfile(result.artifact_paths.source_chunks_jsonl, latest_dir / "source_chunks.jsonl")
+    shutil.copyfile(result.artifact_paths.dataset_draft_csv, latest_dir / "dataset_draft.csv")
+    shutil.copyfile(result.artifact_paths.metadata_json, latest_dir / "metadata.json")
 
 
 def write_dataset_build_artifacts(result: DatasetBuildResult) -> None:
@@ -132,3 +144,4 @@ def write_dataset_build_artifacts(result: DatasetBuildResult) -> None:
         json.dumps(metadata, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
+    _write_latest_alias_assets(result)

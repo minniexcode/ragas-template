@@ -53,4 +53,7 @@ def build_metric_pipeline(
         "context_recall": ContextRecall(llm=llm),
         "context_precision": ContextPrecision(llm=llm),
     }
-    return MetricPipeline(metrics={name: registry[name] for name in scenario.metrics})
+    return MetricPipeline(
+        metrics={name: registry[name] for name in scenario.metrics},
+        metric_timeout_seconds=settings.ragas_metric_timeout_seconds,
+    )

@@ -1,0 +1,22 @@
+scenario_name: sample-pdf-question-bank-online
+mode: online
+dataset: ../../datasets/raw/generated/sample-pdf-question-bank.csv
+judge_model: deepseek-v4-flash
+embedding_model: text-embedding-v3
+metrics:
+  - faithfulness
+  - answer_relevancy
+  - context_recall
+  - context_precision
+output_dir: ../../outputs/online/sample-pdf-question-bank
+runtime:
+  batch_size: 2
+  app_concurrency: 2
+  metric_concurrency: 2
+  max_samples: 45
+app_adapter:
+  type: python
+  callable: apps.pdf_question_bank.adapter:run
+  static_kwargs:
+    source_chunks_path: ../../outputs/dataset-builds/sample-pdf-question-bank/latest/source_chunks.jsonl
+    model: deepseek-v4-flash

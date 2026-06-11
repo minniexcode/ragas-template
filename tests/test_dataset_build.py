@@ -400,12 +400,11 @@ class DatasetBuildTests(unittest.TestCase):
         )
         gateway = AliyunDocmindGateway(settings)
 
-        def fake_import(name: str):
-            if name.startswith("alibabacloud_"):
-                raise ImportError(name)
-            raise AssertionError(f"unexpected import: {name}")
-
-        with mock.patch("rag_eval.dataset_builder.parser.aliyun_docmind_gateway.importlib.import_module", side_effect=fake_import):
+        with mock.patch("rag_eval.dataset_builder.parser.aliyun_docmind_gateway.DocmindClient", None), mock.patch(
+            "rag_eval.dataset_builder.parser.aliyun_docmind_gateway.docmind_models", None
+        ), mock.patch("rag_eval.dataset_builder.parser.aliyun_docmind_gateway.openapi_models", None), mock.patch(
+            "rag_eval.dataset_builder.parser.aliyun_docmind_gateway.runtime_models", None
+        ):
             with self.assertRaises(ImportError):
                 gateway._load_sdk()
 
@@ -468,6 +467,10 @@ class DatasetBuildTests(unittest.TestCase):
         self.assertTrue(result.artifact_paths.parse_failures_csv.exists())
         self.assertTrue(result.artifact_paths.metadata_json.exists())
         self.assertTrue(result.job.dataset_path.exists())
+        latest_dir = result.job.artifact_dir / "latest"
+        self.assertTrue((latest_dir / "source_chunks.jsonl").exists())
+        self.assertTrue((latest_dir / "dataset_draft.csv").exists())
+        self.assertTrue((latest_dir / "metadata.json").exists())
 
         with result.artifact_paths.parse_failures_csv.open(encoding="utf-8") as handle:
             rows = list(csv.DictReader(handle))
@@ -477,6 +480,14 @@ class DatasetBuildTests(unittest.TestCase):
         metadata = json.loads(result.artifact_paths.metadata_json.read_text(encoding="utf-8"))
         self.assertEqual(metadata["stats"]["documents_processed"], 1)
         self.assertEqual(metadata["stats"]["parse_failures"], 1)
+        latest_metadata = json.loads((latest_dir / "metadata.json").read_text(encoding="utf-8"))
+        self.assertEqual(latest_metadata["run_id"], result.run_id)
+
+        with result.artifact_paths.source_chunks_jsonl.open(encoding="utf-8") as handle:
+            run_chunks = handle.read()
+        with (latest_dir / "source_chunks.jsonl").open(encoding="utf-8") as handle:
+            latest_chunks = handle.read()
+        self.assertEqual(latest_chunks, run_chunks)
 
     def test_run_dataset_build_single_pdf_input(self) -> None:
         single_pdf_config = self.temp_dir / "single-pdf-build.yaml"

@@ -12,6 +12,18 @@ from .schema import ScenarioModel
 from .validators import validate_scenario
 
 
+def _resolve_static_kwargs_paths(base_dir: Path, raw_kwargs: dict[str, object]) -> dict[str, object]:
+    """Resolve adapter static kwargs that look like relative file-system paths."""
+    resolved: dict[str, object] = {}
+    for key, value in raw_kwargs.items():
+        if key.endswith("_path") and isinstance(value, str):
+            candidate = Path(value)
+            resolved[key] = candidate if candidate.is_absolute() else (base_dir / candidate).resolve()
+            continue
+        resolved[key] = value
+    return resolved
+
+
 def load_scenario(path: str | Path) -> Scenario:
     """Load, validate, and resolve a scenario file into the internal scenario model."""
     scenario_path = Path(path).resolve()
@@ -30,7 +42,7 @@ def load_scenario(path: str | Path) -> Scenario:
             callable=model.app_adapter.callable,
             request_template=model.app_adapter.request_template,
             response_mapping=model.app_adapter.response_mapping,
-            static_kwargs=model.app_adapter.static_kwargs,
+            static_kwargs=_resolve_static_kwargs_paths(base_dir, model.app_adapter.static_kwargs),
         )
 
     scenario = Scenario(

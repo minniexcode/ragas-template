@@ -51,6 +51,11 @@
 - dataset: [datasets/normalized/sample_offline_rag_eval.csv](/C:/Users/A200477427/Learnings/ragas-template/datasets/normalized/sample_offline_rag_eval.csv)
 - scenario: [scenarios/offline/sample-offline.yaml](/C:/Users/A200477427/Learnings/ragas-template/scenarios/offline/sample-offline.yaml)
 
+另外还补了一套和 PDF dataset build 配对的离线 smoke 样例：
+
+- dataset: [datasets/normalized/sample_pdf_offline_smoke.csv](/C:/Users/A200477427/Learnings/ragas-template/datasets/normalized/sample_pdf_offline_smoke.csv)
+- scenario: [scenarios/offline/sample-pdf-offline-smoke.yaml](/C:/Users/A200477427/Learnings/ragas-template/scenarios/offline/sample-pdf-offline-smoke.yaml)
+
 这个 dataset 是纯本地文件，不依赖任何在线数据源，包含 3 条标准离线样本，字段就是平台统一要求的：
 
 - `question`
@@ -86,6 +91,14 @@ or
 .\.venv\Scripts\python.exe main.py --scenario scenarios/offline/sample-offline.yaml
 ```
 
+如果你想直接验证 `sample-pdf-build.yaml` 对应的离线 smoke 评测，可以运行：
+
+```powershell
+uv run main.py --scenario scenarios/offline/sample-pdf-offline-smoke.yaml
+or
+.\.venv\Scripts\python.exe main.py --scenario scenarios/offline/sample-pdf-offline-smoke.yaml
+```
+
 运行完成后会输出到：
 
 ```text
@@ -115,6 +128,14 @@ def run(question: str, **kwargs) -> dict:
     }
 ```
 
+其中 [apps/sample_python/adapter.py](/C:/Users/A200477427/Learnings/ragas-template/apps/sample_python/adapter.py) 只是最小 contract 示例。
+如果你要直接评测 `dataset_build` 产出的 PDF 题库，仓库里现在提供了专用实现：
+
+- adapter: [apps/pdf_question_bank/adapter.py](/C:/Users/A200477427/Learnings/ragas-template/apps/pdf_question_bank/adapter.py)
+- online scenario: [scenarios/online/sample-pdf-question-bank-online.yaml](/C:/Users/A200477427/Learnings/ragas-template/scenarios/online/sample-pdf-question-bank-online.yaml)
+
+这个 adapter 会读取题库行中的 `source_chunk_ids`，再从 `source_chunks.jsonl` 里解析出证据块，把这些证据块直接作为 `contexts`，并调用本地 OpenAI 兼容模型生成 `answer`。
+
 ## 6. 结果资产
 
 每次运行都会写出标准本地资产：
@@ -129,7 +150,12 @@ def run(question: str, **kwargs) -> dict:
 
 ## 7. PDF 题库构建
 
-仓库现在额外支持把 PDF 文档解析成可人工复核的在线题库草稿。样例配置在：
+仓库现在额外支持把 PDF 文档解析成可人工复核的在线题库草稿。最推荐的阅读顺序是：
+
+- 快速入口看本节
+- 端到端案例看 [docs/sample-pdf-question-bank-workflow.md](/C:/Users/A200477427/Learnings/ragas-template/docs/sample-pdf-question-bank-workflow.md)
+
+样例配置在：
 
 - [scenarios/dataset_build/sample-pdf-build.yaml](/C:/Users/A200477427/Learnings/ragas-template/scenarios/dataset_build/sample-pdf-build.yaml)
 
@@ -146,6 +172,28 @@ or
 - 扫描单个 PDF 或 PDF 目录
 - 调用阿里云解析能力并归一化成 `source chunks`
 - 调用 LLM 生成在线评测题库草稿
-- 输出 `dataset_draft.csv`、`source_chunks.jsonl`、`parse_failures.csv`、`metadata.json` 等本地资产
+- 输出带时间戳的 run 资产，以及稳定入口 `latest/source_chunks.jsonl`、`latest/dataset_draft.csv`、`latest/metadata.json`
 
 生成后的草稿 dataset 默认只要求 `question` 和 `ground_truth`，后续进入 `online` 评测时再由 adapter 补齐 `answer` 和 `contexts`。
+
+现在这条在线链路已经有一个真实样例：
+
+```powershell
+uv run main.py --scenario scenarios/online/sample-pdf-question-bank-online.yaml
+or
+.\.venv\Scripts\python.exe main.py --scenario scenarios/online/sample-pdf-question-bank-online.yaml
+```
+
+这个 scenario 会：
+
+- 读取 [datasets/raw/generated/sample-pdf-question-bank.csv](/C:/Users/A200477427/Learnings/ragas-template/datasets/raw/generated/sample-pdf-question-bank.csv)
+- 使用 `apps/pdf_question_bank/adapter.py`
+- 显式绑定到 sample build 的稳定入口 `outputs/dataset-builds/sample-pdf-question-bank/latest/source_chunks.jsonl`
+- 在线生成 `answer`
+- 再用 `ground_truth` 对生成结果打分
+
+如果你想按完整顺序跑一遍 sample，从环境变量、dataset build、online eval 到结果查看，直接看：
+
+- [docs/sample-pdf-question-bank-workflow.md](/C:/Users/A200477427/Learnings/ragas-template/docs/sample-pdf-question-bank-workflow.md)
+
+如果你只想先快速跑通离线评测，不想先重新生成题库，可以直接用上面的 [scenarios/offline/sample-pdf-offline-smoke.yaml](/C:/Users/A200477427/Learnings/ragas-template/scenarios/offline/sample-pdf-offline-smoke.yaml)。它是从 sample PDF build 产物固化出来的 smoke dataset，使用 `source chunks` 作为 `contexts`，并用 `ground_truth` 复用为 `answer`。

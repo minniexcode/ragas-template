@@ -2,10 +2,26 @@
 
 from __future__ import annotations
 
-import importlib
 import time
 from pathlib import Path
 from typing import Any
+
+try:
+    from alibabacloud_docmind_api20220711 import models as docmind_models
+    from alibabacloud_docmind_api20220711.client import Client as DocmindClient
+    from alibabacloud_tea_openapi import models as openapi_models
+    from alibabacloud_tea_util import models as runtime_models
+except ImportError:
+    # Keep Alibaba SDK optional so offline flows and tests can import this module.
+    DocmindClient = None
+    docmind_models = None
+    openapi_models = None
+    runtime_models = None
+
+try:
+    from alibabacloud_credentials.client import Client as CredentialClient
+except ImportError:
+    CredentialClient = None
 
 from rag_eval.settings import EvaluationSettings
 
@@ -22,34 +38,32 @@ class AliyunDocmindGateway:
 
     def _load_sdk(self) -> tuple[Any, Any, Any, Any]:
         """Load Alibaba SDK modules lazily so tests and offline flows do not require them."""
-        try:
-            client_module = importlib.import_module("alibabacloud_docmind_api20220711.client")
-            openapi_models = importlib.import_module("alibabacloud_tea_openapi.models")
-            docmind_models = importlib.import_module("alibabacloud_docmind_api20220711.models")
-            runtime_models = importlib.import_module("alibabacloud_tea_util.models")
-        except ImportError as exc:
+        if (
+            DocmindClient is None
+            or openapi_models is None
+            or docmind_models is None
+            or runtime_models is None
+        ):
             raise ImportError(
                 "Alibaba Cloud Docmind SDK is not installed. "
                 "Install alibabacloud-docmind-api20220711, "
                 "alibabacloud-tea-openapi, alibabacloud-tea-util, and "
                 "alibabacloud-credentials."
-            ) from exc
-        return client_module, openapi_models, docmind_models, runtime_models
+            )
+        return DocmindClient, openapi_models, docmind_models, runtime_models
 
     def _resolve_credentials(self) -> tuple[str, str]:
         """Resolve AccessKey credentials from settings or the Alibaba credentials client."""
         if self.settings.alibaba_access_key_id and self.settings.alibaba_access_key_secret:
             return self.settings.alibaba_access_key_id, self.settings.alibaba_access_key_secret
 
-        try:
-            credential_module = importlib.import_module("alibabacloud_credentials.client")
-        except ImportError as exc:
+        if CredentialClient is None:
             raise ImportError(
                 "Alibaba Cloud credentials SDK is not installed and no explicit "
                 "ALIBABA_ACCESS_KEY_ID / ALIBABA_ACCESS_KEY_SECRET were provided."
-            ) from exc
+            )
 
-        credential_client = credential_module.Client()
+        credential_client = CredentialClient()
         credential = credential_client.get_credential()
         return credential.get_access_key_id(), credential.get_access_key_secret()
 
@@ -58,7 +72,7 @@ class AliyunDocmindGateway:
         if self._client is not None:
             return self._client
 
-        client_module, openapi_models, docmind_models, runtime_models = self._load_sdk()
+        client_class, openapi_models, docmind_models, runtime_models = self._load_sdk()
         access_key_id, access_key_secret = self._resolve_credentials()
         endpoint = (self.settings.alibaba_endpoint or "docmind-api.cn-hangzhou.aliyuncs.com").strip()
         config = openapi_models.Config(
@@ -69,7 +83,7 @@ class AliyunDocmindGateway:
         config.region_id = "cn-hangzhou"
         config.type = "access_key"
 
-        self._client = client_module.Client(config)
+        self._client = client_class(config)
         self._models = docmind_models
         self._runtime_models = runtime_models
         return self._client

@@ -70,15 +70,31 @@ class Evaluator:
         if self.app_adapter is None:
             raise ValueError("online mode requires an app adapter.")
 
+        valid: list[NormalizedSample] = []
+        invalid: list[InvalidSample] = []
+
+        async def enrich_with_capture(sample: NormalizedSample) -> NormalizedSample | InvalidSample:
+            """Convert adapter exceptions into invalid samples instead of aborting the run."""
+            try:
+                return await self.app_adapter.enrich_sample(sample)
+            except Exception as exc:
+                error_type = type(exc).__name__
+                return InvalidSample(
+                    sample_id=sample.sample_id,
+                    error=f"adapter failed [{error_type}]: {exc}",
+                    raw=sample.raw,
+                )
+
         factories = [
-            (lambda sample=sample: self.app_adapter.enrich_sample(sample))
+            (lambda sample=sample: enrich_with_capture(sample))
             for sample in samples
         ]
         results = await gather_with_limit(factories, self.scenario.runtime.app_limit())
 
-        valid: list[NormalizedSample] = []
-        invalid: list[InvalidSample] = []
         for sample in results:
+            if isinstance(sample, InvalidSample):
+                invalid.append(sample)
+                continue
             # Treat incomplete adapter payloads as invalid so reporting stays explicit.
             errors: list[str] = []
             if not sample.answer:
